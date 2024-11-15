@@ -70,10 +70,13 @@ import java_cup.runtime.*;
 /***********************/
 /* MACRO DECALARATIONS */
 /***********************/
-LineTerminator	= \r|\n|\r\n
-WhiteSpace		= {LineTerminator} | [ \t]
-INTEGER			= 0 | [1-9][0-9]*
-ID				= [a-z]+
+CommentCharacters 	= [a-z]|[A-Z]|[0-9]|[ \t] | \? | \!| \+| \-| \*| \(|\)| \[|\]| \{|\}| \.| \;
+LineTerminator		= \r|\n|\r\n
+SingleLineComment	= (\/\/)({CommentCharacters}*){LineTerminator} // consider removing the LineTerminator. may be better
+MultyLineComment	= (\/\*)({CommentCharacters} | {LineTerminator})*(\*\/)
+WhiteSpace			= {LineTerminator} | [ \t]
+INTEGER				= 0 | [1-9][0-9]* // TODO constraint of size <= 2^15-1
+ID					= [a-zA-Z][a-zA-Z0-9]*
 
 /******************************/
 /* DOLAR DOLAR - DON'T TOUCH! */
@@ -91,14 +94,39 @@ ID				= [a-z]+
 /* scanner is in the start state YYINITIAL.                   */
 /**************************************************************/
 
+<YYINITIAL> "class"           	 { return symbol(TokenNames.CLASS); }
+<YYINITIAL> "nil"           { return symbol(TokenNames.NIL); }
+<YYINITIAL> "array"           { return symbol(TokenNames.ARRAY); }
+<YYINITIAL> "while"           { return symbol(TokenNames.WHILE); }
+<YYINITIAL> "int"           { return symbol(TokenNames.INT); }
+<YYINITIAL> "void"           { return symbol(TokenNames.VOID); }
+<YYINITIAL> "extends"           { return symbol(TokenNames.EXTENDS); }
+<YYINITIAL> "return"           { return symbol(TokenNames.RETURN); }
+<YYINITIAL> "new"           { return symbol(TokenNames.NEW); }
+<YYINITIAL> "if"            { return symbol(TokenNames.IF); }
+<YYINITIAL> "string"              { return symbol(TokenNames.STRING); }
+
 <YYINITIAL> {
 
 "+"					{ return symbol(TokenNames.PLUS);}
 "-"					{ return symbol(TokenNames.MINUS);}
-"PPP"				{ return symbol(TokenNames.TIMES);}
+"*"					{ return symbol(TokenNames.TIMES);}
 "/"					{ return symbol(TokenNames.DIVIDE);}
 "("					{ return symbol(TokenNames.LPAREN);}
 ")"					{ return symbol(TokenNames.RPAREN);}
+"["					{ return symbol(TokenNames.LBRACK);}
+"]"					{ return symbol(TokenNames.RBRACK);}
+"{"					{ return symbol(TokenNames.LBRACE);}
+"}"					{ return symbol(TokenNames.RBRACE);}
+","					{ return symbol(TokenNames.COMMA);}
+"."					{ return symbol(TokenNames.DOT);}
+";"					{ return symbol(TokenNames.SEMICOLON);}
+":="				{ return symbol(TokenNames.ASSIGN);}
+"="					{ return symbol(TokenNames.EQ);}
+"<"					{ return symbol(TokenNames.LT);}
+">"					{ return symbol(TokenNames.GT);}
+{SingleLineComment} { return symbol(TokenNames.ID, new String(yytext()));}
+{MultyLineComment} { return symbol(TokenNames.ID, new String(yytext()));}
 {INTEGER}			{ return symbol(TokenNames.NUMBER, new Integer(yytext()));}
 {ID}				{ return symbol(TokenNames.ID,     new String( yytext()));}   
 {WhiteSpace}		{ /* just skip what was found, do nothing */ }
