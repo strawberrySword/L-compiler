@@ -1,6 +1,1 @@
-abcd
-//asdasds;afsdaf
-/* asd */
-asd */
-moish 77 999 zebra
-90
+"string"

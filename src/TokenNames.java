@@ -7,14 +7,14 @@ public interface TokenNames {
   public static final int DIVIDE = 4;
   public static final int LPAREN = 5;
   public static final int RPAREN = 6;
-  public static final int NUMBER = 7;
+  public static final int INT = 7;
   public static final int ID = 8;
   public static final int CLASS = 9;
   public static final int NIL = 10;
   public static final int ARRAY = 11;
   public static final int WHILE = 12;
-  public static final int INT = 13;
-  public static final int VOID = 14;
+  public static final int TYPE_INT = 13;
+  public static final int TYPE_VOID = 14;
   public static final int EXTENDS = 15;
   public static final int RETURN = 16;
   public static final int NEW = 17;
@@ -31,4 +31,5 @@ public interface TokenNames {
   public static final int EQ = 28;
   public static final int LT = 29;
   public static final int GT = 30;
+  public static final int TYPE_STRING = 31;
 }
