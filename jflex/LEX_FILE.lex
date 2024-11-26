@@ -80,12 +80,12 @@ import java_cup.runtime.*;
 /* MACRO DECALARATIONS */
 /***********************/
 LineTerminator		= \r|\n|\r\n
-CommentCharacters 	= [a-z]|[A-Z]|[0-9]|[ \t] | \? | \!| \+| \-| \*| \(|\)| \[|\]| \{|\}| \.| \;
+CommentCharacters 	= [a-z]|[A-Z]|[0-9]|[ \t] | ; | \? | \!| \+| \-| \*| \(|\)| \[|\]| \{|\}| \.| \/
 SingleLineComment	= "//"({CommentCharacters}*){LineTerminator}?
-MultyLineComment	= "/*"({CommentCharacters} | {LineTerminator})*"*/"
-Comment 			= {SingleLineComment}| {MultyLineComment} 	
+MultyLineComment	= {CommentCharacters} | {LineTerminator}
+Comment 			= {SingleLineComment}
 WhiteSpace			= {LineTerminator} | [ \t]
-INTEGER				= 0 | [1-9][0-9]* // TODO constraint of size <= 2^15-1
+INTEGER				= 0 | [1-9][0-9]*
 ID					= [a-zA-Z][a-zA-Z0-9]*
 String				= (\")[a-zA-Z]*(\")
 
@@ -93,6 +93,7 @@ String				= (\")[a-zA-Z]*(\")
 /* DOLAR DOLAR - DON'T TOUCH! */
 /******************************/
 
+%state COMMENT_STATE
 %%
 
 /************************************************************/
@@ -104,7 +105,13 @@ String				= (\")[a-zA-Z]*(\")
 /* So these regular expressions will only be matched if the   */
 /* scanner is in the start state YYINITIAL.                   */
 /**************************************************************/
-
+<YYINITIAL> "/*"            {yybegin(COMMENT_STATE);}
+<COMMENT_STATE> {
+	"*/"					{yybegin(YYINITIAL);}
+	{MultyLineComment} 	{}
+	<<EOF>>					{ throw new Error("Unclosed Comment");}
+	.						{ throw new Error("Illegal comment character");}
+}
 <YYINITIAL> "class"			{ return symbol(TokenNames.CLASS); }
 <YYINITIAL> "nil"			{ return symbol(TokenNames.NIL); }
 <YYINITIAL> "array"			{ return symbol(TokenNames.ARRAY); }
@@ -133,7 +140,6 @@ String				= (\")[a-zA-Z]*(\")
 <YYINITIAL> "="				{ return symbol(TokenNames.EQ);}
 <YYINITIAL> "<"				{ return symbol(TokenNames.LT);}
 <YYINITIAL> ">"				{ return symbol(TokenNames.GT);}
-
 <YYINITIAL> {
 
 {INTEGER}			{
